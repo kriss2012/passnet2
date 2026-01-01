@@ -1,6 +1,6 @@
 Flask
 tensorflow-cpu
 pandas
-numpy
+numpy<2.0
 scikit-learn
 gunicorn
