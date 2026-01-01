@@ -5,6 +5,20 @@ from flask import Flask, request, jsonify, render_template
 # IMPORTANT: Using standard keras import for compatibility
 from keras.models import load_model 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" # Hide messy logs
+
+# --- MEMORY FIX ---
+import tensorflow as tf
+try:
+    # Tell TensorFlow to barely use any memory at startup
+    tf.config.set_visible_devices([], 'GPU') 
+    visible_devices = tf.config.get_visible_devices()
+    for device in visible_devices:
+        tf.config.experimental.set_memory_growth(device, True)
+except:
+    pass
+# ------------------
 
 app = Flask(__name__)
 
