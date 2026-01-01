@@ -8,63 +8,110 @@
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .container { background: #2d2d2d; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 400px; }
         h1 { margin-bottom: 20px; font-weight: 300; }
-        input { width: 90%; padding: 15px; border-radius: 5px; border: none; background: #404040; color: white; font-size: 1.2em; outline: none; text-align: center; margin-bottom: 20px; }
+        
+        /* Input Styling */
+        input { width: 90%; padding: 15px; border-radius: 5px; border: none; background: #404040; color: white; font-size: 1.2em; outline: none; text-align: center; margin-bottom: 20px; box-sizing: border-box; }
+        
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+
+        /* Results Styling */
         .result-box { margin-top: 20px; min-height: 80px; }
         .bar-container { background: #444; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
         .bar { height: 100%; width: 0%; transition: width 0.5s, background 0.5s; }
-        .feedback { margin-top: 10px; font-size: 0.9em; opacity: 0.8; }
+        .feedback { margin-top: 15px; font-size: 0.9em; opacity: 0.9; line-height: 1.4; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PassNet AI</h1>
         <p>Deep Learning Password Analysis</p>
+        
         <input type="text" id="password" placeholder="Type a password..." autocomplete="off">
+        <button id="analyze-btn" onclick="analyzePassword()">Analyze Strength</button>
         
         <div class="result-box">
             <h2 id="score-text">0%</h2>
             <div class="bar-container">
                 <div class="bar" id="score-bar"></div>
             </div>
-            <div class="feedback" id="feedback-text">Waiting for input...</div>
+            <div class="feedback" id="feedback-text">Enter a password and click Analyze.</div>
         </div>
     </div>
 
     <script>
         const input = document.getElementById('password');
+        const btn = document.getElementById('analyze-btn');
         const scoreText = document.getElementById('score-text');
         const scoreBar = document.getElementById('score-bar');
         const feedbackText = document.getElementById('feedback-text');
 
-        let timeout = null;
+        // Allow pressing "Enter" to trigger the button
+        input.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                btn.click();
+            }
+        });
 
-        input.addEventListener('input', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(async () => {
-                const pwd = input.value;
-                if(pwd.length === 0) {
-                    scoreBar.style.width = '0%';
-                    scoreText.innerText = '0%';
-                    feedbackText.innerText = 'Waiting for input...';
-                    return;
-                }
+        async function analyzePassword() {
+            const pwd = input.value;
+            
+            if(pwd.length === 0) {
+                feedbackText.innerText = "Please type a password first.";
+                feedbackText.style.color = "yellow";
+                return;
+            }
 
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerText = "Analyzing...";
+            feedbackText.innerText = "Consulting the Neural Network...";
+            feedbackText.style.color = "white";
+
+            try {
                 const response = await fetch('/check', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({password: pwd})
                 });
 
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+
                 const data = await response.json();
                 
+                // Update UI with Results
                 scoreText.innerText = data.score + '%';
                 scoreBar.style.width = data.score + '%';
                 scoreBar.style.background = data.color;
                 feedbackText.innerText = data.feedback;
                 feedbackText.style.color = data.color;
 
-            }, 500); // 500ms debounce
-        });
+            } catch (error) {
+                feedbackText.innerText = "Error: Could not connect to the AI model. Try refreshing.";
+                feedbackText.style.color = "red";
+                console.error(error);
+            } finally {
+                // Reset Button
+                btn.disabled = false;
+                btn.innerText = "Analyze Strength";
+            }
+        }
     </script>
 </body>
 </html>
