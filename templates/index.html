@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassNet AI Security</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #2d2d2d; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 400px; }
+        h1 { margin-bottom: 20px; font-weight: 300; }
+        input { width: 90%; padding: 15px; border-radius: 5px; border: none; background: #404040; color: white; font-size: 1.2em; outline: none; text-align: center; margin-bottom: 20px; }
+        .result-box { margin-top: 20px; min-height: 80px; }
+        .bar-container { background: #444; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+        .bar { height: 100%; width: 0%; transition: width 0.5s, background 0.5s; }
+        .feedback { margin-top: 10px; font-size: 0.9em; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PassNet AI</h1>
+        <p>Deep Learning Password Analysis</p>
+        <input type="text" id="password" placeholder="Type a password..." autocomplete="off">
+        
+        <div class="result-box">
+            <h2 id="score-text">0%</h2>
+            <div class="bar-container">
+                <div class="bar" id="score-bar"></div>
+            </div>
+            <div class="feedback" id="feedback-text">Waiting for input...</div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('password');
+        const scoreText = document.getElementById('score-text');
+        const scoreBar = document.getElementById('score-bar');
+        const feedbackText = document.getElementById('feedback-text');
+
+        let timeout = null;
+
+        input.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(async () => {
+                const pwd = input.value;
+                if(pwd.length === 0) {
+                    scoreBar.style.width = '0%';
+                    scoreText.innerText = '0%';
+                    feedbackText.innerText = 'Waiting for input...';
+                    return;
+                }
+
+                const response = await fetch('/check', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password: pwd})
+                });
+
+                const data = await response.json();
+                
+                scoreText.innerText = data.score + '%';
+                scoreBar.style.width = data.score + '%';
+                scoreBar.style.background = data.color;
+                feedbackText.innerText = data.feedback;
+                feedbackText.style.color = data.color;
+
+            }, 500); // 500ms debounce
+        });
+    </script>
+</body>
+</html>
