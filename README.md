@@ -1,10 +1,3 @@
-Here is a professional, portfolio-ready **README.md** file for your project.
-
-You can copy the code block below, create a file named `README.md` in your project folder, and paste the content inside.
-
----
-
-```markdown
 # 🔐 PassNet: AI-Powered Password Strength Checker
 
 > A Deep Learning application that uses an LSTM Neural Network to analyze password strength based on patterns found in real-world data leaks.
@@ -57,18 +50,16 @@ PassNet_Project/
 
 ### 1. Clone the Repository
 
-```bash
+bash
 git clone [https://github.com/yourusername/passnet.git](https://github.com/yourusername/passnet.git)
 cd passnet
 
-```
 
 ### 2. Install Dependencies
 
-```bash
+bash
 pip install -r requirements.txt
 
-```
 
 ### 3. Download the Dataset
 
@@ -121,8 +112,6 @@ This project includes a `Procfile` for easy deployment on platforms like **Rende
 
 This project is open-source and available for educational purposes.
 
-```
-
 ### 💡 One Last Tip for You:
 To make your GitHub repository look professional, you should create a file named `.gitignore` in your folder and add the following lines to it. This prevents you from accidentally uploading the massive text file or junk files to GitHub:
 
@@ -133,8 +122,3 @@ __pycache__/
 rockyou.txt
 training_data.csv
 venv/
-.env
-
-```
-
-Would you like me to explain how to add a "Screenshot" section to the README once you have the app running?
